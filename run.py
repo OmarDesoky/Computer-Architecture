@@ -1,7 +1,6 @@
 import os
-
 inputList = []
-
+from assembler import *
 def read():
 	path = os.listdir('./inputs')	
 	path = os.path.join('inputs','sample.txt')
@@ -19,7 +18,7 @@ def write(inputList):
 			file.write(inputList[i])
 		else:
 			#function call here
-			print("Func Called")
+			#file.write(setIR(inputList[i]))
 			pass
 	file.close()
 
