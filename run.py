@@ -5,7 +5,8 @@ import os
 dataSegment = 0
 codeSegment = 500
 dataStart = 0
-variables = {}
+variablesValues = {}
+variablesAddresses = {}
 def read():
 	path = os.listdir('./inputs')
 	path = os.path.join('inputs','sample.txt')
@@ -17,18 +18,17 @@ def read():
 	dataStart = inputList.index("HLT")+1
 	print(dataStart)
 	print(inputList[:])
+	counter = dataStart
 	for i in inputList[dataStart:]:
 		dataString = i[7:].split()
 		varName = dataString[0]
 		varValue = int(dataString[1])
-		variables[varName] = varValue
-		print(variables)
-	
-	
-
-
-
+		variablesValues[varName] = varValue
+		variablesAddresses[varName] = counter
+		counter+=1
 
 #to test function
 read()
-
+	
+print(variablesAddresses)
+print(variablesValues)
