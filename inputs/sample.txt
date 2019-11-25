@@ -1,2 +1,4 @@
 MOV R1,R2
 ADD @R2,R4
+MOV #7,R1
+5
