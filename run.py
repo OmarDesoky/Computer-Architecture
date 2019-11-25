@@ -1,4 +1,5 @@
 import os
+from assembler import *
 
 
 dataSegment = 0
@@ -6,9 +7,14 @@ codeSegment = 500
 dataStart = 0
 variablesValues = {}
 variablesAddresses = {}
-from assembler import *
 inputList = []
+
+
 def read():
+	global inputList
+	global variablesAddresses
+	global variablesValues
+	global dataStart
 	path = os.listdir('./inputs')	
 	path = os.path.join('inputs','sample.txt')
 	with open(path,"r") as f:
@@ -17,8 +23,6 @@ def read():
 		i = i.upper()
 	inputList = [x.upper() for x in inputList]; inputList
 	dataStart = inputList.index("HLT")+1
-	print(dataStart)
-	print(inputList[:])
 	counter = dataStart
 	for i in inputList[dataStart:]:
 		dataString = i[7:].split()
@@ -30,11 +34,13 @@ def read():
 	return inputList
 
 		
-def write(inputList):
+def write():
+	global inputList
+	global dataStart
 	path = os.listdir('./outputs')
 	path = os.path.join('outputs','output.txt')
 	file = open(path,'w')
-	for i in range(len(inputList)):
+	for i in range(len(inputList[:dataStart])):
 		if(inputList[i].isnumeric()):
 			file.write(inputList[i])
 		else:
@@ -44,5 +50,5 @@ def write(inputList):
 	file.close()
 
 if __name__ == "__main__":
-	inputlist = read()
-	write(inputlist)
+	read()
+	write()
