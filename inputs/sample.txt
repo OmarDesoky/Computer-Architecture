@@ -1,2 +1,5 @@
 MOV R1,R2
-ADD @R2,R4
+AdD @R2,R4
+HLT
+Define N 100
+Define x 120
