@@ -1,0 +1,2 @@
+MOV R1,R2
+ADD @R2,R4
