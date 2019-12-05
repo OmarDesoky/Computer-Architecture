@@ -224,5 +224,3 @@ def set_ir(string, offset):
     return ir
 
 
-x = set_ir("ADD @R1,R2", 2)
-print(x)

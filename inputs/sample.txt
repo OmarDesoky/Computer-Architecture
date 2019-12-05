@@ -1,10 +1,11 @@
-MOV R1,R2
-AdD #7,#5
-MOV #7,R1
-CMP R1,r3
-MOV N,#45
-5
+cmp @#Xx,@#Xx
+CMP @N,@xx
+repeat:
+cmp #1,N
+cmp 1(R3),#555
+cmp 3(r5),@N
 HLT
 Define N 100
 Define x 120
 Define M 110
+define Xx 323
