@@ -131,7 +131,7 @@ def set_ir(string, offset):
     noOperand = NoOperand()
     jsr = Jsr()
     operation = string[0]
-    if operation == "MOV":
+    if operation == "SUB":
         ir = ir | 0x00000000
         ir = ir | set_2operands(operands)
     elif operation == "ADD":
@@ -140,7 +140,7 @@ def set_ir(string, offset):
     elif operation == "ADC":
         ir = ir | 0x00002000
         ir = ir | set_2operands(operands)
-    elif operation == "SUB":
+    elif operation == "MOV":
         ir = ir | 0x00003000
         ir = ir | set_2operands(operands)
     elif operation == "SBC":
