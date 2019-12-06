@@ -5,7 +5,6 @@ from mapper import *
 dataSegmentStart = 0
 codeSegmentStart = 500
 dataStart = 0
-variablesValues = {}
 variablesAddresses = {}
 labelAddresses = {}
 dataList = []
@@ -15,7 +14,6 @@ currentAddress = codeSegmentStart
 def read():
 	global inputList
 	global variablesAddresses
-	global variablesValues
 	global dataStart
 	path = os.listdir('./inputs')	
 	path = os.path.join('inputs','sample.txt')
@@ -23,15 +21,23 @@ def read():
 		inputList = f.read().splitlines()
 	inputList = [x.upper() for x in inputList]; inputList
 	dataStart = inputList.index("HLT")+1
-	counter = 0
-	for i in inputList[dataStart:]:
-		dataString = i[7:].split()
-		varName = dataString[0]
-		varValue = int(dataString[1])
-		variablesValues[varName] = varValue
-		variablesAddresses[varName] = counter
-		dataList.append(int(dataString[1]))
-		counter+=1
+	counter = dataSegmentStart
+	for input in inputList[dataStart:]:
+		if input.find(",") == -1:
+			dataString = input[7:].split()
+			varName = dataString[0]
+			varValue = int(dataString[1])
+			variablesAddresses[varName] = counter
+			dataList.append(varValue)
+			counter+=1
+		else:
+			dataString = input[7:].split()
+			varName = dataString[0]
+			varValues = dataString[1].split(',')
+			for var in varValues:
+				variablesAddresses[varName] = counter
+				dataList.append(int(var))
+				counter+=1
 
 
 	size = len(inputList[:dataStart])
@@ -48,7 +54,7 @@ def read():
 		nType = nFound[2]
 		rel1 = False
 		keyFound = 0
-		for key in variablesValues.keys():
+		for key in variablesAddresses.keys():
 			startSearch = len(inputList[inputNumber].split(",")[0])
 			startSearch = startSearch if startSearch > 0 else 3
 			vIndex = rkeyfind(key,inputList[inputNumber],startSearch)
@@ -99,7 +105,7 @@ def read():
 		nIndex = nFound[0]
 		nType = nFound[2]
 
-		for key in variablesValues.keys():
+		for key in variablesAddresses.keys():
 			vIndex = rkeyfind(key,inputList[inputNumber])
 			if(vIndex != -1):
 				if vIndex < len(inputList[inputNumber])-1:
@@ -162,7 +168,6 @@ def write():
 		for label in labelAddresses.keys():
 			if (rkeyfind(label,input) != -1):
 				labelAddress = labelAddresses[label]
-				print(labelAddress)
 				break
 		if(input.isnumeric() or input.lstrip("-+").isnumeric()):
 			#file.write(input+"\n")
@@ -183,5 +188,4 @@ def write():
 if __name__ == "__main__":
 	read()
 	print(inputList)
-	print(labelAddresses)
 	write()
