@@ -121,7 +121,7 @@ def set_1operand(operand):
     return new_ir
 
 
-def set_ir(string, offset):
+def set_ir(string, offset, labelAddress):
     ir = 0
     string = string.upper().split()
     if len(string) > 1:                          # if instruction has operands

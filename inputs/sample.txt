@@ -3,6 +3,7 @@ CMP @N,@xx
 repeat:
 cmp #1,N
 cmp 1(R3),#555
+jmp repeat
 cmp 3(r5),@N
 HLT
 Define N 100

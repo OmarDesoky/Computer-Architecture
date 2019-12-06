@@ -83,13 +83,13 @@ def read():
 
 			elif preVariable == "@":
 				inputList[inputNumber]=inputList[inputNumber][0:vIndex-1]+inputList[inputNumber][vIndex-1:].replace(("@"+str(keyFound)),"@X(R7)")
-				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-1))
+				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-2+dataSegmentStart))
 				size+=1
 				dataStart+=1
 				rel1 = True
 			elif preVariable == " " or preVariable == ",":
 				inputList[inputNumber]=inputList[inputNumber][0:vIndex]+inputList[inputNumber][vIndex:].replace((str(keyFound)),"X(R7)")
-				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-1))
+				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-2+dataSegmentStart))
 				size+=1
 				dataStart+=1
 				rel1 = True
@@ -134,12 +134,12 @@ def read():
 
 			elif preVariable == "@":
 				inputList[inputNumber]=inputList[inputNumber][0:vIndex-2]+inputList[inputNumber][vIndex-2:].replace(("@"+str(keyFound)),"@X(R7)")
-				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-1))
+				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-2+dataSegmentStart))
 				size+=1
 				dataStart+=1
 			elif preVariable == " " or preVariable == ",":
 				inputList[inputNumber]=inputList[inputNumber][0:vIndex]+inputList[inputNumber][vIndex:].replace((str(keyFound)),"X(R7)")
-				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-1))
+				inputList.insert(inputNumber+1,str(variablesAddresses[keyFound]-codeSegmentStart-inputNumber-2+dataSegmentStart))
 				size+=1
 				dataStart+=1
 		inputNumber+=1
@@ -150,6 +150,7 @@ def write():
 	global inputList
 	global dataStart
 	global codeSegmentStart
+	global labelAddresses
 	currentAddress = codeSegmentStart
 	codeSeg = os.listdir('./outputs')
 	codeSeg = os.path.join('outputs','output.txt')
@@ -157,13 +158,19 @@ def write():
 	dataSeg = os.path.join('outputs','data.txt')
 	file = open(codeSeg,'w')
 	for input in inputList[:dataStart]:
-		
+		labelAddress = -1
+		for label in labelAddresses.keys():
+			if (rkeyfind(label,input) != -1):
+				labelAddress = labelAddresses[label]
+				print(labelAddress)
+				break
 		if(input.isnumeric() or input.lstrip("-+").isnumeric()):
 			#file.write(input+"\n")
 			file.write(toBinary(input)+"\n")
 		else:
 			# file.write(str(set_ir(input,currentAddress))+"\n")
-			file.write(toBinary(set_ir(input,currentAddress))+"\n")
+			offset = labelAddress-currentAddress-1
+			file.write(toBinary(set_ir(input,offset,labelAddress))+"\n")
 
 		currentAddress+=1
 	file.close()
