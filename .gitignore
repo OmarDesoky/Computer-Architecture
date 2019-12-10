@@ -1,3 +1,16 @@
 __pycache__
 
 .vscode/launch.json
+
+#folders
+.idea
+
+*.cr.mti
+
+*.mpf
+
+*.vhd.bak
+
+.vhdl-code/work
+
+.vhdl-code/transcript
