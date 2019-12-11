@@ -11,6 +11,8 @@ __pycache__
 
 *.vhd.bak
 
-.vhdl-code/work
+vhdl-code/work
 
-.vhdl-code/transcript
+vhdl-code/transcript
+
+*.wlf
