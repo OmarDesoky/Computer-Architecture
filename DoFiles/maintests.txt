@@ -1,0 +1,81 @@
+vsim -gui work.main
+add wave sim:/main/*
+force -freeze sim:/main/Clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/main/control_store 000000000000000000000
+force -freeze sim:/main/reg_clear 111111111111111111
+force -freeze sim:/main/flags_enable 1
+force -freeze sim:/main/testinput 0000000011010100
+run
+force -freeze sim:/main/reg_clear 000000000000000000
+force -freeze sim:/main/control_store 110011000110000011111
+run
+
+# add two numbers and put it  in z
+force -freeze sim:/main/control_store 110011100000000011111
+force -freeze sim:/main/testinput 0000000011010111
+run
+force -freeze sim:/main/testinput 0000000000000001
+force -freeze sim:/main/control_store 110011011000000000001
+run
+# output the added number on the bus,disconnect test input 
+force -freeze sim:/main/control_store 110011000001010000001
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ 0
+run
+# load in R3 the value of the input
+force -freeze sim:/main/control_store 110011101000000000001
+force -freeze sim:/main/testinput 0000000011110000
+run
+# load from r3 to r4 
+force -freeze sim:/main/control_store 110011 110 00 010 00 11111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+#put the value from r4 in the y 
+force -freeze sim:/main/control_store 110011100000010011111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+# add y to the given input 
+force -freeze sim:/main/control_store 110011011000000000001
+force -freeze sim:/main/testinput 0000000000000011
+run
+# PC-out, MAR-in
+force -freeze sim:/main/control_store 110011000011100011111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+pc-in-inc
+force -freeze sim:/main/control_store 110011010000000011111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+#repeat the steps
+# PC-out, MAR-in
+force -freeze sim:/main/control_store 110011000011100011111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+pc-in-inc
+force -freeze sim:/main/control_store 110011010000000011111
+force -freeze sim:/main/testinput ZZZZZZZZZZZZZZZZ
+run
+#===============================================================
+#==========================COMPONENTS===========================
+#===============================================================
+
+# register_nbits
+vsim -gui work.register_nbits
+add wave sim:/register_nbits/*
+force -freeze sim:/register_nbits/Clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/register_nbits/Rst 1 0
+run
+force -freeze sim:/register_nbits/d 0000000011110000 0
+force -freeze sim:/register_nbits/Rst 0
+force -freeze sim:/register_nbits/enable 1
+run
+
+#incrementor 
+add wave sim:/incrementor/*
+force -freeze sim:/incrementor/Clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/incrementor/Rst 1 
+run
+force -freeze sim:/incrementor/enable 1 
+force -freeze sim:/incrementor/d 0000000000000001 
+run
+force -freeze sim:/incrementor/Rst 0 
+run
