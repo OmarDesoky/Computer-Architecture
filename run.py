@@ -67,7 +67,6 @@ def read():
 		if(vIndex == nIndex == -1):
 			inputNumber+=1
 			continue
-		index = vIndex if vIndex > nIndex else nIndex
 		if(nIndex>vIndex):
 			if(nType == 0):
 				inputList[inputNumber]=inputList[inputNumber][0:nIndex]+inputList[inputNumber][nIndex:].replace((str(nValue)+"("),"X(")
@@ -113,7 +112,6 @@ def read():
 						continue
 				keyFound = key
 				break
-		index = vIndex if vIndex > nIndex else nIndex
 		if(vIndex == nIndex == -1):
 			inputNumber+=1
 			continue
@@ -158,11 +156,13 @@ def write():
 	global codeSegmentStart
 	global labelAddresses
 	currentAddress = codeSegmentStart
-	codeSeg = os.listdir('./outputs')
-	codeSeg = os.path.join('outputs','output.txt')
-	dataSeg = os.listdir('./outputs')
-	dataSeg = os.path.join('outputs','data.txt')
-	file = open(codeSeg,'w')
+	RAM_DATA = os.listdir('./outputs')
+	RAM_DATA = os.path.join('outputs','RAM_DATA.txt')
+	file = open(RAM_DATA,'w')
+	for data in dataList:
+			file.write(toBinary(str(data))+"\n")
+	for i in range(len(dataList),codeSegmentStart):
+			file.write("".zfill(16)+"\n")
 	for input in inputList[:dataStart]:
 		labelAddress = -1
 		for label in labelAddresses.keys():
@@ -176,13 +176,11 @@ def write():
 			# file.write(str(set_ir(input,currentAddress))+"\n")
 			offset = labelAddress-currentAddress-1
 			file.write(toBinary(set_ir(input,offset,labelAddress))+"\n")
-
 		currentAddress+=1
+	for i in range(codeSegmentStart+len(inputList[:dataStart]),4096):
+		file.write("".zfill(16)+"\n")
 	file.close()
-	file = open(dataSeg,'w')
-	for data in dataList:
-			file.write(str(data)+"\n")
-	file.close()
+
 
 
 if __name__ == "__main__":
