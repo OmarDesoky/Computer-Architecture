@@ -29,7 +29,6 @@ ARCHITECTURE syncrama OF RAM IS
 		for i in 0 to (2**addressBits-1) loop
 			readline(text_file, text_line);
 			read(text_line, bv);
-			--ram_content(i):= "0000000000001100";
 			ram_content(i) := To_StdLogicVector(bv);
 		end loop;
   		return ram_content;
