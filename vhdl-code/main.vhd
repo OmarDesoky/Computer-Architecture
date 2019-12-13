@@ -51,7 +51,15 @@ PORT( Clk,Rst : IN std_logic;
 );
 	
 END COMPONENT;
-
+COMPONENT mdr_register IS
+GENERIC ( n : integer := 16);
+PORT( Clk,Rst : IN std_logic;
+	    d,d2 : IN std_logic_vector(n-1 DOWNTO 0);
+	    q : OUT std_logic_vector(n-1 DOWNTO 0);
+	enable,enable2: in std_logic
+);
+	
+END COMPONENT;
 --PC with 2 inputs with 2 enables 
 COMPONENT pc_register IS
 GENERIC ( n : integer := 16);
@@ -95,8 +103,19 @@ PORT(  d_input  : IN std_logic_vector(2 DOWNTO 0);
 	d_enable: IN std_logic;
        d_output : OUT std_logic_vector(7 downto 0));
 END COMPONENT;
+COMPONENT RAM IS
+	Generic(addressBits: integer :=12;
+		wordSize: integer :=16);
+	PORT(
+		clk : IN std_logic;
+		we  : IN std_logic;
+		address : IN  std_logic_vector(addressBits - 1 DOWNTO 0);
+		datain  : IN  std_logic_vector(wordSize - 1 DOWNTO 0);
+		dataout : OUT std_logic_vector(wordSize - 1 DOWNTO 0));
+END COMPONENT;
 
 SIGNAL mainbus,y_to_alu,incrementor_pc,alu_to_z,ir_out,in_fr,ir_address,out_fr :  std_logic_vector(15 downto 0);
+signal from_ram:std_logic_vector(15 downto 0);
 type mySignal is array (0 to 12) of std_logic_vector(15 downto 0);
 
 signal regiTri: mySignal;
@@ -104,7 +123,9 @@ signal regiTri: mySignal;
 signal alu_to_fr: std_logic_vector(4 downto 0);	-- C | Z | N | P | O
 -- TODO :flag register enable 
 signal flags_enable: std_logic;
-
+-- RAM Address
+signal temp_address: std_logic_vector(15 downto 0);
+signal address: std_logic_vector(5 downto 0);
 -- Control signals decoded 
 signal f1,f3,src,dst : std_logic_vector(7 downto 0);
 signal f2,f4 : std_logic_vector(3 downto 0);
@@ -127,6 +148,14 @@ dst_address_decoder: decoder3X8 PORT MAP( ir_out(2 downto 0), '1', dst);
 
 alu_component : ALU PORT MAP(y_to_alu,mainbus,control_store(4 downto 0),'1',cout,alu_to_z,alu_to_fr	-- C | Z | N | P | O 
 );
+
+-- Define Ram and prepare its address 
+temp_address <= regiTri(9); -- MAR
+address <= temp_address(5 downto 0);
+RAM_COMP: RAM PORT MAP (clk,f4(2),address,regiTri(8),from_ram); -- Data in is MDR
+
+
+
 -- Define all the needed registers connecting the clock, reset signal, main bus, output to tri-state buffer , and the enable in
 -- f1(5) => Rsrc-in , f1(6)=> Rdst-in , source address = IR8 IR7 IR6 , destination address = IR2 IR1 IR0
 -- src only out 1 to the corrsponding register address, dst same
@@ -169,19 +198,20 @@ SP_tristate: tristate PORT MAP(regiTri(6),SP_out,mainbus);
 PC : pc_register PORT MAP(clk,reg_clear(7),mainbus,incrementor_pc,regiTri(7),f1(1),f1(2));
 PC_tristate_buffer: pc_tristate PORT MAP(regiTri(7),f3(6),mainbus,incrementor_pc);
 
-MDR : register_nbits PORT MAP(clk,reg_clear(8),mainbus,regiTri(8),f1(7));
-MDR_tristate: tristate PORT MAP(regiTri(8),f3(3),mainbus);
+MDR: mdr_register PORT MAP(clk,reg_clear(8),from_ram,mainbus,regiTri(8),rd,f1(7));
+tristatebuffers: tristate PORT MAP(regiTri(8),f3(3),mainbus);
+
 
 MAR : register_nbits PORT MAP(clk,reg_clear(9),mainbus,regiTri(9),f2(1));
 MAR_tristate: tristate PORT MAP(regiTri(9),f3(4),mainbus);
 
-SOURCE : register_nbits PORT MAP(clk,reg_clear(10),mainbus,regiTri(10),f2(2));
+SOURCE : register_nbits PORT MAP(clk,reg_clear(10),mainbus,regiTri(10),f1(4));
 SOURCE_tristate: tristate PORT MAP(regiTri(10),f3(7),mainbus);
 
 Z : register_nbits PORT MAP(clk,reg_clear(11),alu_to_z,regiTri(11),f1(3));
 Z_tristate: tristate PORT MAP(regiTri(11),f3(5),mainbus);
 
-Y : register_nbits PORT MAP(clk,reg_clear(12),mainbus,y_to_alu,f1(4));
+Y : register_nbits PORT MAP(clk,reg_clear(12),mainbus,y_to_alu,f2(2));
 
 in_fr <= "00000000000"&alu_to_fr;
 FR : register_nbits PORT MAP(clk,reg_clear(13),in_fr,out_fr,flags_enable);
