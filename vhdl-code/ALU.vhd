@@ -7,7 +7,7 @@ ENTITY ALU is
 	generic(n: integer :=4);
 	port(	a,b: in std_logic_vector(n-1 downto 0);
 		sel: in std_logic_vector(4 downto 0);
-		cin: in std_logic;
+		cin,enable: in std_logic;			-- enable flag register
 		cout: out std_logic;
 		f : out std_logic_vector(n-1 downto 0);
 		flags: out std_logic_vector(4 downto 0)		-- C | Z | N | P | O
@@ -31,7 +31,7 @@ temp(0)<='1';
 temp(1)<='0';
 ---
 
-PROCESS (a,b,sel,result,carry) IS
+PROCESS (a,b,sel,result,carry,enable) IS
 variable parity: std_logic;
 BEGIN
 
@@ -57,7 +57,7 @@ elsif(sel="00010" ) then
 elsif(sel="00011" ) then
 	result(n-1 downto 0) <= b;
 	f <= result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 --sbc => a-b-cin
 elsif(sel="00100" ) then
 	result<=std_logic_vector(resize(signed(a), n+1) - resize(signed(b), n+1)- signed(carry));
@@ -67,19 +67,19 @@ elsif(sel="00100" ) then
 elsif(sel="00101" ) then
 	result(n-1 downto 0)<=a and b;
 	f<=result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 	result(n) <='0';
 -- or=> a or b
 elsif(sel="00110" ) then
 	result(n-1 downto 0)<= a or b;
 	f<=result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 	result(n) <='0';
 -- xor => a xor b
 elsif(sel="00111" ) then
 	result(n-1 downto 0)<= a xor b;
 	f<=result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 	result(n) <='0';
 -- inc b => b+1
 elsif(sel="01000" ) then
@@ -95,18 +95,18 @@ elsif(sel="01001" ) then
 elsif(sel="01010" ) then
 	result<= (others=>'0');
 	f<=result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 --invert => not b
 elsif(sel="01011" ) then
 	result(n-1 downto 0)<= not(b);
 	f<=result(n-1 downto 0);
-	cout<='U';
+	cout<='Z';
 	result(n) <='0';
 --logic shift right => lsr b
 elsif(sel="01100" ) then
 	result(n-1 downto 0) <= std_logic_vector(shift_right(signed(b), 1) );
 	f<= result(n-1 downto 0);
-	cout<=('U');
+	cout<=('Z');
 	result(n) <= '0';
 --ror => ror b
 elsif(sel="01101" ) then
@@ -125,7 +125,7 @@ elsif(sel="01110" ) then
 elsif(sel="01111" ) then
 	result(n-1 downto 0)<= std_logic_vector(shift_right(unsigned(b), 1) ) ; 
 	f<= result(n-1 downto 0);
-	cout<=('U');
+	cout<=('Z');
 	result(n) <= '0';
 
 --logic shift left => lsl b
@@ -150,8 +150,35 @@ elsif(sel="10010" ) then
 	result(n) <= b(n-1);
 
 end if;
+			-- assigning flags after performing the operation
+
+-- carry flag
+if(enable ='1') then
+flags(4) <= result(n);
+else
+flags(4) <= 'Z';
+end if;
+
+--zero flag
+if(enable ='1') then
+	if(result = (result'range => '0')) then
+		flags(3) <='1';
+	else
+		flags(3) <='0';
+	end if;
+else
+flags(3)<='Z';
+end if;
+
+--negative flag
+if(enable ='1') then
+flags(2) <= result(n-1);
+else
+flags(2) <= 'Z';
+end if;
 
 --parity flag
+if(enable='1') then 
 parity := '1' ;--initally it's set,as there is no 1's
 for i in 0 to n-1 loop   --check for all the bits.
 	if(result(i) = '1') then --check if the bit is '1'
@@ -159,26 +186,22 @@ for i in 0 to n-1 loop   --check for all the bits.
         end if;
 end loop;
 flags(1) <= parity;
+else
+flags(1) <='Z';
+end if;
+
 
 --overflow flag
-if((sel="00001")or(sel ="00010")) then
+if( ((sel="00001")or(sel ="00010") ) and(enable='1')  ) then
 	flags(0) <= ( not(a(n-1)) and not(b(n-1)) and result(n-1)) or( (a(n-1))and(b(n-1))and not(result(n-1)) );
-elsif((sel="00000")or(sel ="00100")) then
+elsif(((sel="00000")or(sel ="00100")) and (enable='1')) then
 	flags(0) <= ( not(a(n-1))and(b(n-1))and(result(n-1)) ) or ( (a(n-1))and not(b(n-1))and not(result(n-1)) );
-
-else
+elsif(enable ='1') then
 	flags(0) <='0';
-
+else 
+	flags(0)<='Z';
 end if;
 
 END PROCESS;
-		-- assigning flags after performing the operation
--- carry flag
-flags(4) <= result(n);
---zero flag
-flags(3) <= '1' when result = (result'range => '0') else
-	 '0';
---negative flag
-flags(2) <= result(n-1);
 
 END ALU_Arch;
