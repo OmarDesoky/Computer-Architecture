@@ -12,15 +12,37 @@ END main;
 ARCHITECTURE a_main_mix OF main IS  
 -- adding alu compoenet to the architecture
 COMPONENT ALU is
-	generic(n: integer :=16);
+	generic(n: integer :=4);
 	port(	a,b: in std_logic_vector(n-1 downto 0);
 		sel: in std_logic_vector(4 downto 0);
-		cin: in std_logic;
-		cout: out std_logic;
+		cin: in std_logic;			-- enable flag register
 		f : out std_logic_vector(n-1 downto 0);
 		flags: out std_logic_vector(4 downto 0)		-- C | Z | N | P | O
 	    );
+
 END COMPONENT;
+-- ==============Adding address generator ===============
+COMPONENT NewAddress IS
+	PORT(PLA_ADDRESS : IN std_logic_vector(5 DOWNTO 0);		--ADDRESS FROM PLA
+		BITOR_ADDRESS : IN std_logic_vector(5 DOWNTO 0);	--ADDRESS FROM BIT ORING
+		 NEW_ADDRESS : OUT std_logic_vector(5 DOWNTO 0));	--OUTPUT NEW ADDRESS TO uAR
+
+END COMPONENT;
+COMPONENT PLA IS
+	PORT(Address : IN std_logic_vector(5 DOWNTO 0);		--current address from temp register
+		IR : IN std_logic_vector(15 DOWNTO 0);		--IR resgister
+		FR: IN std_logic_vector(15 DOWNTO 0);		--FLAG REGISTER
+		 R : OUT std_logic_vector(5 DOWNTO 0));		--Output address
+
+END COMPONENT;
+COMPONENT BitOrModule IS
+	PORT(Address : IN std_logic_vector(5 DOWNTO 0);		--currnet address from temp register
+		IR : IN std_logic_vector(15 DOWNTO 0);		--IR register
+		NextAddress : std_logic_vector(5 DOWNTO 0);	--next address from rom
+		 R : OUT std_logic_vector(5 DOWNTO 0));		--new address 
+
+END COMPONENT;
+--========================================================
 -- adding register components to the architecture 
 COMPONENT register_nbits IS
 GENERIC ( n : integer := 16);
@@ -103,6 +125,7 @@ PORT(  d_input  : IN std_logic_vector(2 DOWNTO 0);
 	d_enable: IN std_logic;
        d_output : OUT std_logic_vector(7 downto 0));
 END COMPONENT;
+-- MEMORY =============================================================================
 COMPONENT RAM IS
 	Generic(addressBits: integer :=12;
 		wordSize: integer :=16);
@@ -113,7 +136,15 @@ COMPONENT RAM IS
 		datain  : IN  std_logic_vector(wordSize - 1 DOWNTO 0);
 		dataout : OUT std_logic_vector(wordSize - 1 DOWNTO 0));
 END COMPONENT;
-
+COMPONENT ROM IS
+	Generic(addressBits: integer :=6;
+		wordSize: integer :=21);
+	PORT(
+		address : IN  std_logic_vector(addressBits - 1 DOWNTO 0);
+		dataout : OUT std_logic_vector(wordSize - 1 DOWNTO 0));
+END COMPONENT;
+-- =====================================================================================
+-- SIGNALS USED ========================================================================
 SIGNAL mainbus,y_to_alu,incrementor_pc,alu_to_z,ir_out,in_fr,ir_address,out_fr :  std_logic_vector(15 downto 0);
 signal from_ram:std_logic_vector(15 downto 0);
 type mySignal is array (0 to 12) of std_logic_vector(15 downto 0);
@@ -134,8 +165,11 @@ signal naf,temp_micrimar,temp_to_boc_and_pla : std_logic_vector(5 downto 0);
 -- general purpose registers signals(in,out) 
 signal R0_in,R1_in,R2_in,R3_in,R4_in,R5_in,SP_in: std_logic;
 signal R0_out,R1_out,R2_out,R3_out,R4_out,R5_out,SP_out: std_logic;
---desoky
-signal cout: std_logic;
+--============== Address generator signals
+SIGNAL PLA_ADDRESS, BITOR_ADDRESS,NEW_ADDRESS : std_logic_vector(5 downto 0);
+--=====================================================================
+--=======================BEGINING of the program ======================
+--=====================================================================
 BEGIN 
 mainbus <= testinput;
 naf <= control_store(20 downto 15);
@@ -146,7 +180,8 @@ f4_decoder : decoder2X4 PORT MAP( control_store(6 downto 5), '1', f4);
 src_address_decoder: decoder3X8 PORT MAP( ir_out(8 downto 6), '1', src);
 dst_address_decoder: decoder3X8 PORT MAP( ir_out(2 downto 0), '1', dst);
 
-alu_component : ALU PORT MAP(y_to_alu,mainbus,control_store(4 downto 0),'1',cout,alu_to_z,alu_to_fr	-- C | Z | N | P | O 
+--TODO carry in
+alu_component : ALU PORT MAP(y_to_alu,mainbus,control_store(4 downto 0),'1',alu_to_z,alu_to_fr	-- C | Z | N | P | O 
 );
 
 -- Define Ram and prepare its address 
@@ -216,8 +251,12 @@ Y : register_nbits PORT MAP(clk,reg_clear(12),mainbus,y_to_alu,f2(2));
 in_fr <= "00000000000"&alu_to_fr;
 FR : register_nbits PORT MAP(clk,reg_clear(13),in_fr,out_fr,flags_enable);
 
-micro_MAR : micro_mar_register PORT MAP(clk,reg_clear(14),naf,temp_micrimar,'1');
+--============== address of the rom handled here
+address_generator_comp: NewAddress PORT MAP(PLA_ADDRESS, BITOR_ADDRESS,NEW_ADDRESS );	--OUTPUT NEW ADDRESS TO uAR
+pla_comp : PLA PORT MAP(temp_to_boc_and_pla,ir_out,out_fr,PLA_ADDRESS);		
+boc_comp: BitOrModule PORT MAP(temp_to_boc_and_pla,ir_out,naf,BITOR_ADDRESS);		
 
+micro_MAR : micro_mar_register PORT MAP(clk,reg_clear(14),NEW_ADDRESS,temp_micrimar,'1');
 temp : temp_register PORT MAP(clk,reg_clear(15),temp_micrimar,temp_to_boc_and_pla,'1');
 
 ir_address<="00000000"&ir_out(7 downto 0);
