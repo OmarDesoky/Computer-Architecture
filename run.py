@@ -157,8 +157,8 @@ def write():
 	global codeSegmentStart
 	global labelAddresses
 	currentAddress = codeSegmentStart
-	RAM_DATA = os.listdir('./outputs')
-	RAM_DATA = os.path.join('outputs','RAM_DATA.txt')
+	RAM_DATA = os.listdir('./vhdl-code')
+	RAM_DATA = os.path.join('vhdl-code','RAM_DATA.txt')
 	file = open(RAM_DATA,'w')
 	for data in dataList:
 			file.write(toBinary(str(data))+"\n")
