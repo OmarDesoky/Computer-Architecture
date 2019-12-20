@@ -66,7 +66,7 @@ def set_2operands(operand):
         if operand[1].find('+') != -1:
             new_ir = new_ir | 0b000000001000
         if operand[1].find('-') != -1:
-            new_ir = new_ir | 0b010000010000
+            new_ir = new_ir | 0b000000010000
 
         # source registers
         if operand[0].find("R0") != -1:
