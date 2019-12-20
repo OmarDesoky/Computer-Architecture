@@ -1,0 +1,7 @@
+Add R0,R1
+ADd -4(R1),@R2
+7a7a:
+ADD r1,r2
+RRC (R7)+
+BEQ 7a7a
+HLT

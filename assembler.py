@@ -1,14 +1,33 @@
+def twosComplement(string):
+    integer = int(string)
+    return bin(integer+(1<<16))
+def toBinary(string):
+	integer = int(string)
+	if(integer>=0):
+		return str(bin(integer)).lstrip("-0b").zfill(16)
+	else:
+		return str(twosComplement(string)).lstrip("-0b").rjust(16,"1") 
+def intToBinary(integer):
+    if(integer>=0):
+        return integer
+    else:
+        return integer+(1<<16)
+
+
 # creating OP-CODE for the branch instructions
+
+
 class Branch:
     def __init__(self,off):
         self.offset = off
-        self.BR = bin(0b1010000000000000 | off)
-        self.BEQ = bin(0b1010000100000000 | off)
-        self.BNE = bin(0b1010001000000000 | off)
-        self.BLO = bin(0b1010001100000000 | off)
-        self.BLS = bin(0b1010010000000000 | off)
-        self.BHI = bin(0b1010010100000000 | off)
-        self.BHS = bin(0b1010011000000000 | off)
+        self.BR = intToBinary(0b1010000000000000 | off)
+        self.BEQ = intToBinary(0b1010000100000000 | off)
+        self.BNE = intToBinary(0b1010001000000000 | off)
+        self.BLO = intToBinary(0b1010001100000000 | off)
+        self.BLS = intToBinary(0b1010010000000000 | off)
+        self.BHI = intToBinary(0b1010010100000000 | off)
+        self.BHS = intToBinary(0b1010011000000000 | off)
+
 
 
 class NoOperand:
@@ -124,10 +143,12 @@ def set_1operand(operand):
 def set_ir(string, offset, labelAddress):
     ir = 0
     string = string.upper().split()
+    operands = []
     if len(string) > 1:                          # if instruction has operands
         string[1] = string[1].replace(" ", "")    # remove spaces
         operands = string[1].split(",")          # split operands
-    branch = Branch(offset)
+    print(0b0000000011111111 & intToBinary(offset),bin(0b0000000011111111 & intToBinary(offset)),offset,bin(intToBinary(offset)))
+    branch = Branch((0b0000000011111111 & intToBinary(offset)))
     noOperand = NoOperand()
     jsr = Jsr()
     operation = string[0]
@@ -161,37 +182,37 @@ def set_ir(string, offset, labelAddress):
     # one operand instructions
     elif operation == "INC":
         ir = ir | 0x0000C000
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "DEC":
         ir = ir | 0x0000C040
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "CLR":
         ir = ir | 0x0000C080
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "INV":
         ir = ir | 0x0000C0C0
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "LSR":
         ir = ir | 0x0000C100
-        ir = ir | set_1operands(operands)
-    elif operation == "RDR":
+        ir = ir | set_1operand(operands)
+    elif operation == "ROR":
         ir = ir | 0x0000C140
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "RRC":
         ir = ir | 0x0000C180
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "ASR":
         ir = ir | 0x0000C1C0
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "LSL":
         ir = ir | 0x0000C200
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "ROL":
         ir = ir | 0x0000C240
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     elif operation == "RLC":
         ir = ir | 0x0000C280
-        ir = ir | set_1operands(operands)
+        ir = ir | set_1operand(operands)
     # Branch instructions
     elif operation == "BR":
         ir = ir | branch.BR
@@ -222,5 +243,3 @@ def set_ir(string, offset, labelAddress):
     elif operation == "IRET":
         ir = ir | jsr.IRET
     return ir
-
-

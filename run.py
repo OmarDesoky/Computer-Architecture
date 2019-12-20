@@ -1,5 +1,5 @@
 import os
-from assembler import set_ir
+from assembler import *
 from mapper import *
 
 dataSegmentStart = 0
@@ -16,7 +16,7 @@ def read():
 	global variablesAddresses
 	global dataStart
 	path = os.listdir('./inputs')	
-	path = os.path.join('inputs','sample.txt')
+	path = os.path.join('inputs','inputTEST.txt')
 	with open(path,"r") as f:
 		inputList = f.read().splitlines()
 	inputList = [x.upper() for x in inputList]; inputList
@@ -54,6 +54,7 @@ def read():
 		nType = nFound[2]
 		rel1 = False
 		keyFound = 0
+		vIndex = -1
 		for key in variablesAddresses.keys():
 			startSearch = len(inputList[inputNumber].split(",")[0])
 			startSearch = startSearch if startSearch > 0 else 3

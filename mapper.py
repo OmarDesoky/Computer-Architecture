@@ -14,14 +14,20 @@ def rnumberFind(inputString,start = 0,end = -1):
 			
 
 			if indexCondition:
-				while(inputString[iterator].isnumeric()):
+				while(inputString[iterator].isnumeric() or inputString[iterator] == "-"):
+					if(inputString[iterator]== "-"):
+						data*=-1
+						return [iterator,data,0]
 					data+=int(inputString[iterator])*multiplier
 					multiplier*=10
 					iterator-=1
 				if(inputString[iterator] == ' ' or inputString[iterator] == ','):
 					return [iterator,data,0]
 			else:
-				while(inputString[iterator].isnumeric()):
+				while(inputString[iterator].isnumeric() or inputString[iterator] == "-"):
+					if(inputString[iterator]== "-"):
+						data*=-1
+						return [iterator,data,0]
 					data+=int(inputString[iterator])*multiplier
 					multiplier*=10
 					iterator-=1
@@ -47,9 +53,9 @@ def rkeyfind(key, inputString , start = 0, end = -1):
 	else:
 		return -1
 
-def toBinary(string):
-	integer = int(string)
-	if(integer>=0):
-		return str(bin(integer)).lstrip("-0b").zfill(16)
-	else:
-		return str(bin(~integer)).lstrip("-0b").rjust(16,"1") #faulty!!
+# def toBinary(string):
+# 	integer = int(string)
+# 	if(integer>=0):
+# 		return str(bin(integer)).lstrip("-0b").zfill(16)
+# 	else:
+# 		return str(bin(~integer)).lstrip("-0b").rjust(16,"1") #faulty!!
