@@ -173,8 +173,8 @@ SIGNAL control_store : std_logic_vector(20 downto 0);
 SIGNAL f1,f3,src,dst : std_logic_vector(7 downto 0);
 SIGNAL f2,f4 : std_logic_vector(3 downto 0);
 -- general purpose registers signals(in,out) 
-SIGNAL R0_in,R1_in,R2_in,R3_in,R4_in,R5_in,SP_in: std_logic;
-SIGNAL R0_out,R1_out,R2_out,R3_out,R4_out,R5_out,SP_out: std_logic;
+SIGNAL R0_in,R1_in,R2_in,R3_in,R4_in,R5_in,SP_in,PC_in: std_logic;
+SIGNAL R0_out,R1_out,R2_out,R3_out,R4_out,R5_out,SP_out,PC_out: std_logic;
 -- flag register enable 
 SIGNAL flags_enable,carry_in: std_logic;
 
@@ -273,8 +273,10 @@ BEGIN
 	IR : register_nbits PORT MAP(clk,reg_clear(16),mainbus,ir_out,f2(3));
 	IR_tristate: tristate PORT MAP(ir_address,f4(3),mainbus);
 -- =================== Incrementor ==============================================
-	PC : pc_register PORT MAP(clk,reg_clear(7),mainbus,incrementor_pc,regiTri(7),f1(1),f1(2));
-	PC_tristate_buffer: pc_tristate PORT MAP(regiTri(7),f3(6),mainbus,incrementor_pc);
+	PC_in <=((f1(5))and(src(7)))or((f1(6))and(dst(7))) or f1(1);
+	PC_out <= ((f3(2))and(src(7)))or((f3(1))and(dst(7))) or f3(6);
+	PC : pc_register PORT MAP(clk,reg_clear(7),mainbus,incrementor_pc,regiTri(7),PC_in,f1(2));
+	PC_tristate_buffer: pc_tristate PORT MAP(regiTri(7),PC_out,mainbus,incrementor_pc);
 	INC: incrementor PORT MAP(clk,reg_clear(17),incrementor_pc,regiTri(12),f3(6));
 	INC_tristate:  tristate PORT MAP(regiTri(12),f1(2),incrementor_pc);
 -- ==============================================================================
