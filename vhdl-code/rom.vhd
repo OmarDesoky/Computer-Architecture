@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.numeric_std.all;
+use std.textio.all;
 
 ENTITY ROM IS
 	Generic(addressBits: integer :=6;

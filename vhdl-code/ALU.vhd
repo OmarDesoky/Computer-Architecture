@@ -3,7 +3,7 @@ USE IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 ENTITY ALU is
-	generic(n: integer :=4);
+	generic(n: integer :=16);
 	port(	a,b: in std_logic_vector(n-1 downto 0);
 		sel: in std_logic_vector(4 downto 0);
 		cin: in std_logic;			-- enable flag register
