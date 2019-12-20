@@ -12,7 +12,7 @@ PORT( Clk,Rst : IN std_logic;
 END mdr_register;
 ARCHITECTURE a_mdr_register OF mdr_register IS
 BEGIN
-PROCESS (d,d2,Clk,Rst)
+PROCESS (d,d2,Clk,Rst,enable,enable2)
 BEGIN
 IF Rst = '1' THEN
 q <= (OTHERS=>'0');

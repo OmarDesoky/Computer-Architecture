@@ -14,7 +14,7 @@ PORT( Clk,Rst : IN std_logic;
 END pc_register;
 ARCHITECTURE a_pc_register_nbits OF pc_register IS
 BEGIN
-PROCESS (d,Clk,Rst)
+PROCESS (d,Clk,Rst,enable,enable2,d2)
 BEGIN
 IF Rst = '1' THEN
 q <= std_logic_vector(to_unsigned(codeSegmentStart, q'length));
