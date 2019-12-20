@@ -126,6 +126,14 @@ elsif(sel="10010" ) then
 	result(n-1 downto 0) <= ( a(n-2 downto 0) & cin);
 	f<= result(n-1 downto 0) ;
 	result(n) <= a(n-1);
+-- inc b => b+1
+elsif(sel="10011" ) then
+	result <= std_logic_vector(resize(signed(b), n+1)+ signed(temp) );
+	f<=result(n-1 downto 0);
+-- dec b => b-1
+elsif(sel="10100" ) then
+	result<= std_logic_vector(resize(signed(b), n+1)-signed(temp));
+	f<=result(n-1 downto 0);
 
 end if;
 			-- assigning flags after performing the operation
