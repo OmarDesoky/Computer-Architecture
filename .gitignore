@@ -17,3 +17,7 @@ vhdl-code/transcript
 
 *.wlf
 *.xlsx
+*.vstf
+
+.vs/
+.idea/workspace.xml

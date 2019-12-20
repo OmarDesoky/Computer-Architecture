@@ -269,7 +269,7 @@ BEGIN
 
 	rom_comp:ROM PORT MAP(address_of_cs,control_store);
 --==========================================================================
-	ir_address<="00000000"&ir_out(7 downto 0);
+	ir_address<= ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7)&ir_out(7 downto 0);
 	IR : register_nbits PORT MAP(clk,reg_clear(16),mainbus,ir_out,f2(3));
 	IR_tristate: tristate PORT MAP(ir_address,f4(3),mainbus);
 -- =================== Incrementor ==============================================

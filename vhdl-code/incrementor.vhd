@@ -14,7 +14,7 @@ PORT( Clk,Rst : IN std_logic;
 END incrementor;
 ARCHITECTURE a_incrementor_register_nbits OF incrementor IS
 BEGIN
-PROCESS (d,Clk,Rst)
+PROCESS (d,Clk,Rst,enable)
 BEGIN
 IF Rst = '1' THEN
 q <= (OTHERS=>'0');

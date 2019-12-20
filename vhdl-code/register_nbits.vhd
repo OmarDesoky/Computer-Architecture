@@ -12,7 +12,7 @@ PORT( Clk,Rst : IN std_logic;
 END register_nbits;
 ARCHITECTURE a_register_nbits OF register_nbits IS
 BEGIN
-PROCESS (d,Clk,Rst)
+PROCESS (d,Clk,Rst,enable)
 BEGIN
 IF Rst = '1' THEN
 q <= (OTHERS=>'0');
