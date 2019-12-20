@@ -72,60 +72,60 @@ elsif(sel="00111" ) then
 	result(n-1 downto 0)<= a xor b;
 	f<=result(n-1 downto 0);
 	result(n) <='0';
--- inc b => b+1
+-- inc a => a+1
 elsif(sel="01000" ) then
-	result <= std_logic_vector(resize(signed(b), n+1)+ signed(temp) );
+	result <= std_logic_vector(resize(signed(a), n+1)+ signed(temp) );
 	f<=result(n-1 downto 0);
--- dec b => b-1
+-- dec a => a-1
 elsif(sel="01001" ) then
-	result<= std_logic_vector(resize(signed(b), n+1)-signed(temp));
+	result<= std_logic_vector(resize(signed(a), n+1)-signed(temp));
 	f<=result(n-1 downto 0);
 -- clr => f=>0
 elsif(sel="01010" ) then
 	result<= (others=>'0');
 	f<=result(n-1 downto 0);
---invert => not b
+--invert => not a
 elsif(sel="01011" ) then
-	result(n-1 downto 0)<= not(b);
+	result(n-1 downto 0)<= not(a);
 	f<=result(n-1 downto 0);
 	result(n) <='0';
---logic shift right => lsr b
+--logic shift right => lsr a
 elsif(sel="01100" ) then
-	result(n-1 downto 0) <= std_logic_vector(shift_right(signed(b), 1) );
+	result(n-1 downto 0) <= std_logic_vector(shift_right(signed(a), 1) );
 	f<= result(n-1 downto 0);
 	result(n) <= '0';
---ror => ror b
+--ror => ror a
 elsif(sel="01101" ) then
-	result(n-1 downto 0)<= ( b(0) & b(n-1 downto 1) );
+	result(n-1 downto 0)<= ( a(0) & a(n-1 downto 1) );
 	f<= result(n-1 downto 0);
-	result(n) <= b(0);
+	result(n) <= a(0);
 
---rrc => rrc b
+--rrc => rrc a
 elsif(sel="01110" ) then
-	result(n-1 downto 0)<=( cin & b(n-1 downto 1) );
+	result(n-1 downto 0)<=( cin & a(n-1 downto 1) );
 	f<= result(n-1 downto 0);
-	result(n) <= b(0);
---arthi shift right => asr b
+	result(n) <= a(0);
+--arthi shift right => asr a
 elsif(sel="01111" ) then
-	result(n-1 downto 0)<= std_logic_vector(shift_right(unsigned(b), 1) ) ; 
+	result(n-1 downto 0)<= std_logic_vector(shift_right(unsigned(a), 1) ) ; 
 	f<= result(n-1 downto 0);
 	result(n) <= '0';
 
---logic shift left => lsl b
+--logic shift left => lsl a
 elsif(sel="10000" ) then
-	result(n-1 downto 0) <=(b(n-2 downto 0) & "0");
+	result(n-1 downto 0) <=(a(n-2 downto 0) & "0");
 	f<= result(n-1 downto 0) ;
 
---rol => rol b
+--rol => rol a
 elsif(sel="10001" ) then
-	result(n-1 downto 0) <=( b(n-2 downto 0) & b(n-1) );
+	result(n-1 downto 0) <=( a(n-2 downto 0) & a(n-1) );
 	f<= result(n-1 downto 0) ;
 
---rlc  => rlc b
+--rlc  => rlc a
 elsif(sel="10010" ) then
-	result(n-1 downto 0) <= ( b(n-2 downto 0) & cin);
+	result(n-1 downto 0) <= ( a(n-2 downto 0) & cin);
 	f<= result(n-1 downto 0) ;
-	result(n) <= b(n-1);
+	result(n) <= a(n-1);
 
 end if;
 			-- assigning flags after performing the operation
