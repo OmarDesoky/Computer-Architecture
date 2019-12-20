@@ -16,7 +16,7 @@ PROCESS (d,d2,Clk,Rst)
 BEGIN
 IF Rst = '1' THEN
 q <= (OTHERS=>'0');
-ELSIF (enable2='1'and rising_edge(Clk)) then
+ELSIF (enable2='1'and Clk = '1') then
 q<=d2;
 ELSIF (enable='1') THEN
 q <= d;

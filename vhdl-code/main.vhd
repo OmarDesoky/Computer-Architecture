@@ -83,7 +83,8 @@ PORT( Clk,Rst : IN std_logic;
 END COMPONENT;
 --PC with 2 inputs with 2 enables 
 COMPONENT pc_register IS
-GENERIC ( n : integer := 16);
+GENERIC ( n : integer := 16;
+	  codeSegmentStart: integer :=500);
 PORT( Clk,Rst : IN std_logic;
 	    d,d2 : IN std_logic_vector(n-1 DOWNTO 0);
 	    q : OUT std_logic_vector(n-1 DOWNTO 0);
@@ -99,6 +100,13 @@ PORT( Clk,Rst : IN std_logic;
 		enable: in std_logic
 );
 	
+END COMPONENT;
+
+-- Enable of the flag register
+COMPONENT FRenable IS
+	PORT(Address : IN std_logic_vector(5 DOWNTO 0);
+		 Enable : OUT std_logic);
+
 END COMPONENT;
 -- ====================================================================================
 -- =========================tristate buffers ==========================================
@@ -167,7 +175,7 @@ SIGNAL f2,f4 : std_logic_vector(3 downto 0);
 -- general purpose registers signals(in,out) 
 SIGNAL R0_in,R1_in,R2_in,R3_in,R4_in,R5_in,SP_in: std_logic;
 SIGNAL R0_out,R1_out,R2_out,R3_out,R4_out,R5_out,SP_out: std_logic;
--- TODO :flag register enable 
+-- flag register enable 
 SIGNAL flags_enable,carry_in: std_logic;
 
 --=====================================================================
@@ -184,7 +192,7 @@ BEGIN
 	dst_address_decoder: decoder3X8 PORT MAP( ir_out(2 downto 0), '1', dst);
 
 -- =============================== ALU ==============================================
-	alu_component : ALU PORT MAP(y_to_alu,mainbus,control_store(4 downto 0),carry_in,alu_to_z,alu_to_fr	-- C | Z | N | P | O 
+	alu_component : ALU PORT MAP(y_to_alu,mainbus,control_store(4 downto 0),carry_in,alu_to_z,alu_to_fr	-- C | Z | N| P | O 
 						);
 	Z : register_nbits PORT MAP(clk,reg_clear(11),alu_to_z,regiTri(11),f1(3));
 	Z_tristate: tristate PORT MAP(regiTri(11),f3(5),mainbus);
@@ -230,8 +238,6 @@ BEGIN
 	SP : register_nbits PORT MAP(clk,reg_clear(6),mainbus,regiTri(6),SP_in);
 	SP_tristate: tristate PORT MAP(regiTri(6),SP_out,mainbus);
 
-	PC : pc_register PORT MAP(clk,reg_clear(7),mainbus,incrementor_pc,regiTri(7),f1(1),f1(2));
-	PC_tristate_buffer: pc_tristate PORT MAP(regiTri(7),f3(6),mainbus,incrementor_pc);
 
 	SOURCE : register_nbits PORT MAP(clk,reg_clear(10),mainbus,regiTri(10),f1(4));
 	SOURCE_tristate: tristate PORT MAP(regiTri(10),f3(7),mainbus);
@@ -247,6 +253,8 @@ BEGIN
 	MAR_tristate: tristate PORT MAP(regiTri(9),f3(4),mainbus);
 --===================================================================================
 -- =============Flag register ==========================================================
+	Flags_enable_comp : FRenable PORT MAP(temp_to_boc_and_pla,flags_enable);
+
 	in_fr <= "00000000000"&alu_to_fr;
 	FR : register_nbits PORT MAP(clk,reg_clear(13),in_fr,out_fr,flags_enable);
 	carry_in <= out_fr(4); -- carry flag 
@@ -265,6 +273,8 @@ BEGIN
 	IR : register_nbits PORT MAP(clk,reg_clear(16),mainbus,ir_out,f2(3));
 	IR_tristate: tristate PORT MAP(ir_address,f4(3),mainbus);
 -- =================== Incrementor ==============================================
+	PC : pc_register PORT MAP(clk,reg_clear(7),mainbus,incrementor_pc,regiTri(7),f1(1),f1(2));
+	PC_tristate_buffer: pc_tristate PORT MAP(regiTri(7),f3(6),mainbus,incrementor_pc);
 	INC: incrementor PORT MAP(clk,reg_clear(17),incrementor_pc,regiTri(12),f3(6));
 	INC_tristate:  tristate PORT MAP(regiTri(12),f1(2),incrementor_pc);
 -- ==============================================================================
