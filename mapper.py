@@ -31,6 +31,8 @@ def rnumberFind(inputString,start = 0,end = -1):
 						data*=-1
 						if(inputString[iterator-1] == '#'):
 							return [iterator-1,data,1]
+						else:
+							return [-1,-1,-1]
 					data+=int(inputString[iterator])*multiplier
 					multiplier*=10
 					iterator-=1
