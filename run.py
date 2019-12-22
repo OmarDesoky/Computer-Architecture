@@ -57,17 +57,18 @@ def read():
 		nType = nFound[2]
 		rel1 = False
 		keyFound = 0
-		vIndex = -1
+		maxVariable = -1
 		for key in variablesAddresses.keys():
-			# startSearch = len(inputList[inputNumber].split(",")[0])
-			# startSearch = startSearch if startSearch > 0 else 3
 			vIndex = rkeyfind(key,inputList[inputNumber])
 			if(vIndex != -1):
 				if vIndex+len(key) < len(inputList[inputNumber]):
 					if(inputList[inputNumber][vIndex+len(key)] == "("):
 						continue
-				keyFound = key
-				break
+				if(vIndex > maxVariable):
+					keyFound = key
+					maxVariable = vIndex
+		vIndex = maxVariable
+				
 		if(vIndex == nIndex == -1):
 			inputNumber+=1
 			continue
