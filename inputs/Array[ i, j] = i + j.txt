@@ -1,0 +1,18 @@
+mov #arr,r2
+clr r0
+clr r1
+l1:
+inc r0
+l2:
+inc r1
+mov r0,r3
+add r1,r3
+mov r3,(r2)+
+cmp r1,n
+bne l2
+clr r1
+cmp r0,n
+bne l1
+hlt
+define arr 0,0,0,0,0,0,0,0,0
+define n 3
