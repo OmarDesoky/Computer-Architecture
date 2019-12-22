@@ -15,4 +15,4 @@ finish:
 HLT
 Define MIN 0
 Define N 7
-Define Entries 4,5,-2,-5,-3,8,2
+Define Entries 4,5,3,6,1,8,2
