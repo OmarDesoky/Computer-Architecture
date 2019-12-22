@@ -1,6 +1,6 @@
 # VHDL Processor simulation
 
-This projectis a simulation for a single-bus processor.
+This project is a simulation for a single-bus processor.
 ## Installation
 ### Requirments:
 
