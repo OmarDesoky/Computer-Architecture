@@ -147,7 +147,6 @@ def set_ir(string, offset, labelAddress):
     if len(string) > 1:                          # if instruction has operands
         string[1] = string[1].replace(" ", "")    # remove spaces
         operands = string[1].split(",")          # split operands
-    print(0b0000000011111111 & intToBinary(offset),bin(0b0000000011111111 & intToBinary(offset)),offset,bin(intToBinary(offset)))
     branch = Branch((0b0000000011111111 & intToBinary(offset)))
     noOperand = NoOperand()
     jsr = Jsr()

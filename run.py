@@ -16,7 +16,7 @@ def read():
 	global variablesAddresses
 	global dataStart
 	path = os.listdir('./inputs')	
-	path = os.path.join('inputs','inputTEST.txt')
+	path = os.path.join('inputs','input.txt')
 	with open(path,"r") as f:
 		inputList = f.read().splitlines()
 	inputList = [x.upper() for x in inputList]; inputList
