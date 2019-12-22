@@ -43,6 +43,9 @@ def read():
 	size = len(inputList[:dataStart])
 	inputNumber = 0
 	while inputNumber < size:
+		if(inputList[inputNumber].lstrip("-").isnumeric()):
+			inputNumber+=1
+			continue
 		if(inputList[inputNumber].find(":") != -1):
 			label = inputList[inputNumber].split(":")
 			labelAddresses[label[0]] = inputNumber+codeSegmentStart
@@ -56,12 +59,12 @@ def read():
 		keyFound = 0
 		vIndex = -1
 		for key in variablesAddresses.keys():
-			startSearch = len(inputList[inputNumber].split(",")[0])
-			startSearch = startSearch if startSearch > 0 else 3
-			vIndex = rkeyfind(key,inputList[inputNumber],startSearch)
+			# startSearch = len(inputList[inputNumber].split(",")[0])
+			# startSearch = startSearch if startSearch > 0 else 3
+			vIndex = rkeyfind(key,inputList[inputNumber])
 			if(vIndex != -1):
 				if vIndex+len(key) < len(inputList[inputNumber]):
-					if(inputList[inputNumber][vIndex+len(keyFound)] == "("):
+					if(inputList[inputNumber][vIndex+len(key)] == "("):
 						continue
 				keyFound = key
 				break
